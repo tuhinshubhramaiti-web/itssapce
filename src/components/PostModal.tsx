@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Mic, Square, Play } from 'lucide-react'
+import { Mic, Square, X, Send } from 'lucide-react'
 
 interface PostModalProps {
   type: 'text' | 'voice'
@@ -22,7 +22,6 @@ export function PostModal({ type, onClose, onSubmit }: PostModalProps) {
 
   const startRecording = () => {
     setIsRecording(true)
-    // Simulate recording timer
     const interval = setInterval(() => {
       setRecordingTime(prev => {
         if (prev >= 60) {
@@ -37,64 +36,72 @@ export function PostModal({ type, onClose, onSubmit }: PostModalProps) {
 
   const stopRecording = () => {
     setIsRecording(false)
-    setContent(`Voice recording (${recordingTime}s)`) // Placeholder
+    setContent(`Voice recording (${recordingTime}s)`)
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-primary rounded-lg p-6 w-full max-w-md">
-        <h2 className="text-xl font-bold text-text mb-4">
-          {type === 'text' ? 'Share your thoughts' : 'Record your voice'}
-        </h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center p-4 z-50">
+      <div className="bg-primary rounded-t-2xl w-full max-w-sm shadow-2xl border-t border-divider animate-slide-up">
+        <div className="flex items-center justify-between p-4 border-b border-divider">
+          <h2 className="text-lg font-bold text-text">
+            {type === 'text' ? 'Share your thoughts' : 'Record your voice'}
+          </h2>
+          <button onClick={onClose} className="text-textSecondary hover:text-text">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
         
-        {type === 'text' ? (
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Express yourself freely..."
-            className="w-full h-32 bg-secondary text-text rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-accent"
-          />
-        ) : (
-          <div className="text-center">
-            <div className="w-24 h-24 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-              {isRecording ? (
-                <div className="flex flex-col items-center">
-                  <Square className="w-8 h-8 text-red-500 mb-2" />
-                  <span className="text-textSecondary">{recordingTime}s</span>
-                </div>
-              ) : (
-                <Mic className="w-8 h-8 text-accent" />
-              )}
+        <div className="p-4">
+          {type === 'text' ? (
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Express yourself freely..."
+              className="w-full h-32 bg-secondary text-text rounded-xl p-4 resize-none focus:outline-none focus:ring-2 focus:ring-accent border border-divider"
+            />
+          ) : (
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-accent to-secondaryAccent rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                {isRecording ? (
+                  <div className="flex flex-col items-center">
+                    <Square className="w-8 h-8 text-primary mb-1" />
+                    <span className="text-primary text-sm font-bold">{recordingTime}s</span>
+                  </div>
+                ) : (
+                  <Mic className="w-8 h-8 text-primary" />
+                )}
+              </div>
+              <p className="text-textSecondary mb-4">
+                {isRecording ? 'Recording...' : 'Tap to start recording (max 60s)'}
+              </p>
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`px-6 py-3 rounded-xl font-semibold text-lg shadow-lg transition-all duration-200 transform hover:scale-105 ${
+                  isRecording
+                    ? 'bg-red-500 text-white'
+                    : 'bg-accent text-primary'
+                }`}
+              >
+                {isRecording ? 'Stop' : 'Start Recording'}
+              </button>
             </div>
-            <p className="text-textSecondary mb-4">
-              {isRecording ? 'Recording...' : 'Tap to start recording (max 60s)'}
-            </p>
-            <button
-              onClick={isRecording ? stopRecording : startRecording}
-              className={`px-6 py-2 rounded-lg font-medium ${
-                isRecording
-                  ? 'bg-red-500 text-white'
-                  : 'bg-accent text-primary'
-              }`}
-            >
-              {isRecording ? 'Stop' : 'Start Recording'}
-            </button>
-          </div>
-        )}
+          )}
+        </div>
         
-        <div className="flex space-x-3 mt-6">
+        <div className="flex space-x-3 p-4 border-t border-divider">
           <button
             onClick={onClose}
-            className="flex-1 bg-secondary text-textSecondary py-2 rounded-lg hover:bg-opacity-80 transition-colors"
+            className="flex-1 bg-secondary text-textSecondary py-3 rounded-xl font-medium hover:bg-opacity-80 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={!content.trim()}
-            className="flex-1 bg-accent text-primary py-2 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-opacity-80 transition-colors"
+            className="flex-1 bg-accent text-primary py-3 rounded-xl font-semibold text-lg shadow-lg hover:bg-opacity-90 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
-            Post
+            <Send className="w-5 h-5" />
+            <span>Post</span>
           </button>
         </div>
       </div>
